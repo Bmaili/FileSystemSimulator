@@ -10,6 +10,9 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -19,6 +22,7 @@
     </option>
   </component>
   <component name="ProjectId" id="29pOraexNEBrJOrMz3KikyVi03a" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -69,7 +73,7 @@
       <updated>1653806763915</updated>
       <workItem from="1653806766661" duration="890000" />
       <workItem from="1653807685613" duration="9000" />
-      <workItem from="1653807718654" duration="25000" />
+      <workItem from="1653807718654" duration="880000" />
     </task>
     <servers />
   </component>
