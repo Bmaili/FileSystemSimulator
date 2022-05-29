@@ -12,6 +12,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * 用户组界面，描述其UI并绑定相关事件
+ */
 public class UserGroupPanel extends JPanel {
     JButton createGroupBtn = new JButton("新建用户组");
     JButton delGroupBtn = new JButton("删除该用户组");
@@ -87,7 +90,6 @@ public class UserGroupPanel extends JPanel {
     }
 
     private void eventBind() {
-
         groupCombo.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 UserGroup item = (UserGroup) e.getItem();

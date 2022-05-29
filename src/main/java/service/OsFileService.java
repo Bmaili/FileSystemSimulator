@@ -6,8 +6,20 @@ import pojo.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 
+/**
+ * 通用文件服务类，定义了对文件的一些基本操作
+ */
 public class OsFileService {
+    /**
+     * 定义了普通文件展示的具体详细信息
+     *
+     * @param
+     * @return
+     * @date 17:45 2022/5/29
+     */
     public static String allInfo(OsFile osFile) {
         INode iNode = osFile.iNode;
         Integer auth = iNode.userACL.getOrDefault(FileWindow.userNow, 0);
@@ -27,11 +39,18 @@ public class OsFileService {
                 "\n您的权限: " + authStr;
     }
 
+    /**
+     * 检查该文件名是否可用（不为空不重复）
+     *
+     * @param father 这个文件所属的父目录
+     * @param name   待检查的文件名
+     * @return
+     * @date 17:46 2022/5/29
+     */
     public static boolean checkFileName(Folder father, String name) {
         if (name == null || name.equals("")) {//名字不能为空
             return false;
         }
-
         //文件名不能重复
         ArrayList<OsFile> list = father.fileList;
         for (OsFile str : list) {
@@ -42,6 +61,14 @@ public class OsFileService {
         return true;
     }
 
+    /**
+     * 更改文件名
+     *
+     * @param osFile 选择的文件
+     * @param name   名字
+     * @return
+     * @date 17:47 2022/5/29
+     */
     public static boolean changeName(OsFile osFile, String name) {
         if (!checkFileName(osFile.iNode.father, name)) {
             System.out.println("更改失败！名字为空或重复！");
@@ -51,13 +78,30 @@ public class OsFileService {
         return true;
     }
 
-    //将本地文件转换成模拟文件
-    public static void fileToOsFile(OsFile osFile, String pathStr) {
+    /**
+     * ”写“操作，将本地文件写入到本系统的模拟文件中
+     *
+     * @param osFile  模拟系统中的文件
+     * @param pathStr 本地文件路径
+     * @return
+     * @date 17:49 2022/5/29
+     */
+    public static boolean fileToOsFile(OsFile osFile, String pathStr) {
         if (osFile.iNode.fileType != 0) {
             System.out.println("该文件不是普通文件！");
-            return;
+            return false;
         }
-        //1.释放磁盘块block
+
+        //1.判断：若文件字节数为0或者大于剩余block总容量，则不写入
+        File file = new File(pathStr);
+        int length = (int) file.length();
+        LinkedList<Block> freeBlocks = SuperBlock.superBlock.freeBlocks;
+        if (length == 0 || length > freeBlocks.size() * freeBlocks.get(0).data.length) {
+            System.out.println("文件字节数为0或者大于剩余block总容量");
+            return false;
+        }
+
+        //2.释放磁盘块block
         Block free = osFile.iNode.firstBlock;
         Block nextBlock;
         while (free != null) {
@@ -66,11 +110,7 @@ public class OsFileService {
             free = nextBlock;
         }
 
-        //2.写数据
-        File file = new File(pathStr);
-        if ((int) file.length() == 0) {
-            return;
-        }
+        //3.写数据
         try (FileInputStream fis = new FileInputStream(file);
              ByteArrayOutputStream bos = new ByteArrayOutputStream(1024)) {
 
@@ -79,30 +119,38 @@ public class OsFileService {
             node.blockCount = 0;
             node.modifyTime = new Date();
 
-            int shengyu = (int) file.length();
+            int shengyu = (int) file.length();//本地文件剩余待写的字节数
             Block pre = null;
-            while (shengyu > 0) {
+            while (shengyu > 0) {//当待写入的字节大于0则继续写
                 Block block = BlockService.getOneBlock();
-                if (node.blockCount == 0) {
+                if (node.blockCount == 0) {//如果是第一块
                     node.firstBlock = block;
                 }
                 node.blockCount++;
-                int n = fis.read(block.data);
+                int n = fis.read(block.data);//n为从本地文件一次性读取的字节数
                 bos.write(block.data, 0, n);
-                if (pre != null) {
+                if (pre != null) {//将前一块Block与下一块Block连起来
                     pre.next = block;
                 }
                 pre = block;
                 shengyu -= n;
                 node.fileSize += n;
             }
-            node.lastBlock = pre;
-
+            node.lastBlock = pre;//写完后，pre会指向最后一个Block
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            return false;
         }
     }
 
+    /**
+     * "读"操作，将本系统的模拟文件读到本地文件中
+     *
+     * @param osFile  选择的模拟文件
+     * @param pathStr 本地文件的路径
+     * @return
+     * @date 17:54 2022/5/29
+     */
     public static void osFileToFile(OsFile osFile, String pathStr) {
         if (osFile.iNode.fileType != 0) {
             System.out.println("该文件不是普通文件！");
@@ -113,12 +161,13 @@ public class OsFileService {
         try (FileOutputStream fos = new FileOutputStream(file);
              BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             Block block = osFile.iNode.firstBlock;
-            while (block.next != null) {
+            while (block.next != null) {// 从选择的模拟文件的第一个block开始读，每读完一个block，就循环读下一个block
                 bos.write(block.data);
                 block = block.next;
             }
             if (block != null) {
                 int len = osFile.iNode.fileSize % block.blockSize;
+                //如果len为0，意味着最后一个block刚好填满数据，可以读完，否则对最后一个block只读len长度
                 bos.write(block.data, 0, (len == 0 ? block.blockSize : len));
             }
         } catch (Exception e) {
@@ -126,6 +175,13 @@ public class OsFileService {
         }
     }
 
+    /**
+     * 创建模拟文件
+     *
+     * @param
+     * @return
+     * @date 18:04 2022/5/29
+     */
     public static OsFile createOsFile(String filename, User owner, Integer fileType, Folder father) {
         if (!checkFileName(father, filename)) {
             System.out.println("创建失败！文件名为空或重复！");
@@ -153,6 +209,13 @@ public class OsFileService {
         return file;
     }
 
+    /**
+     * 删除文件
+     *
+     * @param
+     * @return
+     * @date 18:05 2022/5/29
+     */
     public static void deleteOsFile(OsFile osFile, Folder father) {
         if (osFile.iNode.fileType == 1) {//如果删除的文件是目录文件，则递归删除子文件
             Folder folder = (Folder) osFile;
@@ -176,12 +239,21 @@ public class OsFileService {
         father.fileList.remove(osFile);
     }
 
+    /**
+     * 搜索文件
+     *
+     * @param father 当前目录
+     * @param name   文件名
+     * @return
+     * @date 18:05 2022/5/29
+     */
     public static ArrayList<String> searchOsFile(Folder father, String name) {
         ArrayList<String> res = new ArrayList<>();
-        dfsSearchOsFile(father, name, res);
+        dfsSearchOsFile(father, name, res);//实际的搜索函数
         return res;
     }
 
+    // 深度优先递归搜索
     private static void dfsSearchOsFile(Folder father, String name, ArrayList<String> res) {
         for (OsFile fileNow : father.fileList) {
             if (fileNow.iNode.fileType == 0) { //普通文件，检查文件名是否与查询名一致
@@ -194,12 +266,20 @@ public class OsFileService {
         }
     }
 
-    //读、写、执行 权限检查
+    /**
+     * 读、写、执行 权限检查
+     *
+     * @param osFile 选择的文件
+     * @param user   当前的用户
+     * @param auth   期望具备的权限，执行1，写2，读4
+     * @return
+     * @date 18:07 2022/5/29
+     */
     public static boolean authCheck(OsFile osFile, User user, Integer auth) {
         if (osFile == null || user == null) {
             return false;
         }
         Integer userAuth = osFile.iNode.userACL.getOrDefault(user, 0);
-        return (userAuth & auth) == auth;
+        return (userAuth & auth) == auth;//将用户具备的权限与需要的权限 按位与
     }
 }

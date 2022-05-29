@@ -11,6 +11,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
+/*
+ *文件操作页面下方的按钮组控件，描述其UI并绑定相关事件
+ */
 public class ButtonMenuPanel extends JPanel {
 
     ButtonMenuPanel() {
@@ -28,7 +31,7 @@ public class ButtonMenuPanel extends JPanel {
     JButton backCaBtn = new JButton("返回上级目录");
     JButton backRootCaBtn = new JButton("返回根目录");
     JButton searchFileBtn = new JButton("当前目录查找文件");
-    JButton saveSuperBlockBtn = new JButton("同步至磁盘");
+    JButton logoutBtn = new JButton("用户登出");
     JButton authorityBtn = new JButton("该文件权限管理");
     JLabel userlabel = new JLabel();
 
@@ -44,7 +47,6 @@ public class ButtonMenuPanel extends JPanel {
         reNameFileBtn.setToolTipText("需要w权限");
         delteFileBtn.setToolTipText("需要w权限");
         enterCaBtn.setToolTipText("需要x权限");
-        saveSuperBlockBtn.setToolTipText("将当前的所有数据持久化到磁盘中");
 
         writeFileBtn.setPreferredSize(new Dimension(160, 50));
         createFileBtn.setPreferredSize(new Dimension(160, 50));
@@ -56,7 +58,7 @@ public class ButtonMenuPanel extends JPanel {
         backCaBtn.setPreferredSize(new Dimension(160, 50));
         backRootCaBtn.setPreferredSize(new Dimension(160, 50));
         searchFileBtn.setPreferredSize(new Dimension(150, 50));
-        saveSuperBlockBtn.setPreferredSize(new Dimension(160, 50));
+        logoutBtn.setPreferredSize(new Dimension(160, 50));
         authorityBtn.setPreferredSize(new Dimension(160, 50));
         writeFileBtn.setFont(new Font("Serif", 1, 19));
         createFileBtn.setFont(new Font("Serif", 1, 19));
@@ -68,7 +70,7 @@ public class ButtonMenuPanel extends JPanel {
         backCaBtn.setFont(new Font("Serif", 1, 19));
         backRootCaBtn.setFont(new Font("Serif", 1, 19));
         searchFileBtn.setFont(new Font("Serif", 1, 12));
-        saveSuperBlockBtn.setFont(new Font("Serif", 1, 19));
+        logoutBtn.setFont(new Font("Serif", 1, 19));
         authorityBtn.setFont(new Font("Serif", 1, 17));
 
         JPanel box1 = new JPanel();
@@ -86,7 +88,7 @@ public class ButtonMenuPanel extends JPanel {
         box2.add(backCaBtn);
         box2.add(backRootCaBtn);
         box2.add(searchFileBtn);
-        box2.add(saveSuperBlockBtn);
+        box2.add(logoutBtn);
 
         Box all = Box.createVerticalBox();
         all.add(info);
@@ -113,9 +115,14 @@ public class ButtonMenuPanel extends JPanel {
                 fileChooser.showOpenDialog(null);
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 File file = fileChooser.getSelectedFile();
-                OsFileService.fileToOsFile(FileWindow.selectFile, file.getAbsolutePath());
-                FileWindow.fileProperties.updateData();
-                JOptionPane.showMessageDialog(null, "写入成功！");
+                boolean w = OsFileService.fileToOsFile(FileWindow.selectFile, file.getAbsolutePath());
+                if (w) {
+                    FileWindow.fileProperties.updateData();
+                    SuperBlockSercive.saveToDisk();
+                    JOptionPane.showMessageDialog(null, "写入成功！");
+                } else {
+                    JOptionPane.showMessageDialog(null, "写入失败！");
+                }
             }
         });
         createFileBtn.addMouseListener(new MouseAdapter() {
@@ -125,6 +132,7 @@ public class ButtonMenuPanel extends JPanel {
                 OsFileService.createOsFile(inputValue,
                         FileWindow.userNow, 0, FileWindow.folderNow);
                 FileWindow.fileListPanel.updateData();
+                SuperBlockSercive.saveToDisk();
             }
         });
         delteFileBtn.addMouseListener(new MouseAdapter() {
@@ -137,6 +145,7 @@ public class ButtonMenuPanel extends JPanel {
                 OsFileService.deleteOsFile(FileWindow.selectFile, FileWindow.folderNow);
                 FileWindow.selectFile = null;
                 FileWindow.fileListPanel.updateData();
+                SuperBlockSercive.saveToDisk();
             }
         });
 
@@ -172,6 +181,7 @@ public class ButtonMenuPanel extends JPanel {
                 OsFileService.changeName(FileWindow.selectFile, inputValue);
                 FileWindow.fileListPanel.updateData();
                 FileWindow.fileProperties.updateData();
+                SuperBlockSercive.saveToDisk();
             }
         });
 
@@ -200,6 +210,7 @@ public class ButtonMenuPanel extends JPanel {
                 OsFileService.createOsFile(inputValue,
                         FileWindow.userNow, 1, FileWindow.folderNow);
                 FileWindow.fileListPanel.updateData();
+                SuperBlockSercive.saveToDisk();
             }
         });
 
@@ -219,11 +230,11 @@ public class ButtonMenuPanel extends JPanel {
                 new SearchFileDialog().setVisible(true);
             }
         });
-        saveSuperBlockBtn.addMouseListener(new MouseAdapter() {
+        logoutBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                SuperBlockSercive.saveToDisk();
-                JOptionPane.showMessageDialog(null, "持久化完成！");
+                FileWindow.fileWindow.dispose();
+                MainWindow.mainWIndow.setVisible(true);
             }
         });
 

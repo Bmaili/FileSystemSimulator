@@ -3,7 +3,18 @@ package service;
 import pojo.*;
 import controller.FileWindow;
 
+/**
+ * 目录服务类，相对于通用文件类的操作，这里定义了目录文件特有的相关操作
+ */
 public class FolderService {
+
+    /**
+     * 进入目录
+     *
+     * @param osFile 选择的目录文件
+     * @return
+     * @date 17:35 2022/5/29
+     */
     public static void enterDirectory(OsFile osFile) {
         if (osFile.iNode.fileType != 1) {
             System.out.println("不是目录文件");
@@ -13,6 +24,13 @@ public class FolderService {
         FileWindow.selectFile = null;
     }
 
+    /**
+     * 回到上层目录
+     *
+     * @param
+     * @return
+     * @date 17:35 2022/5/29
+     */
     public static void backDirectory() {
         Folder father = FileWindow.folderNow.iNode.father;
         if (father == null) {
@@ -23,10 +41,18 @@ public class FolderService {
     }
 
 
+    /**
+     * 定义了目录展示的具体详细信息
+     *
+     * @param folder 选择的目录
+     * @return
+     * @date 17:36 2022/5/29
+     */
     public static String allInfo(Folder folder) {
         INode iNode = folder.iNode;
         Integer auth = iNode.userACL.getOrDefault(FileWindow.userNow, 0);
         String authStr = ((auth & 4) == 4 ? "r" : "-") + ((auth & 2) == 2 ? "w" : "-") + ((auth & 1) == 1 ? "x" : "-");
+
         return "文件名: " + folder.filename +
                 "\n路径: " + iNode.path +
                 "\n所有者: " + iNode.owner +

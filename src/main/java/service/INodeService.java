@@ -5,9 +5,19 @@ import pojo.SuperBlock;
 
 import java.util.HashMap;
 
+/**
+ * INode结点服务类，定义一些Inode结点的操作
+ */
 public class INodeService {
     private static SuperBlock superBlock = SuperBlock.superBlock;
 
+    /**
+     * 释放一个Inode节点，加到空闲链表
+     *
+     * @param
+     * @return
+     * @date 17:43 2022/5/29
+     */
     public static void freeOneINode(INode node) {
         //手动置为零值
         node.firstBlock = null;
@@ -27,6 +37,13 @@ public class INodeService {
         superBlock.freeINodes.add(node);
     }
 
+    /**
+     * 从空闲链表获取一个Inode结点
+     *
+     * @param
+     * @return
+     * @date 17:43 2022/5/29
+     */
     public static INode getOneINode() {
         if (superBlock.freeINodes.size() < 1) {
             System.out.println("INode不足，获取失败！");

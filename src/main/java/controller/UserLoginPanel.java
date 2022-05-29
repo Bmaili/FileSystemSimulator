@@ -10,17 +10,25 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * 用户登陆界面，描述其UI并绑定相关事件
+ */
 public class UserLoginPanel extends JPanel {
 
     JButton loginBtn = new JButton("登录系统");
     JButton changePWBtn = new JButton("更改密码");
     JButton createUserBtn = new JButton("注册用户");
     JTextField field = new JTextField();
-    JComboBox<User> comboBox = new JComboBox<>(SuperBlock.superBlock.userList.toArray(new User[]{}));
+    JComboBox<User> comboBox = new JComboBox<>();
 
     UserLoginPanel() {
+        updataComboBox();
         uiInit();
         eventBind();
+    }
+
+    public void updataComboBox() {
+        comboBox.setModel(new DefaultComboBoxModel<>(SuperBlock.superBlock.userList.toArray(new User[]{})));
     }
 
     private void uiInit() {
@@ -71,7 +79,8 @@ public class UserLoginPanel extends JPanel {
                 if (user.password.equals(field.getText())) {
                     FileWindow.userNow = user;
                     FileWindow.folderNow = SuperBlock.superBlock.rootFile;
-                    FileWindow.init();
+                    FileWindow.init(); //重新初始化一个文件窗口
+                    MainWindow.mainWIndow.setVisible(false);//将主窗口隐藏
                 } else {
                     JOptionPane.showMessageDialog(null, "密码错误！");
                 }
@@ -104,6 +113,7 @@ public class UserLoginPanel extends JPanel {
                     String name = JOptionPane.showInputDialog("请输入新用户名，初始密码等于666");
                     if (UserService.createUser(name, "666")) {//初始密码等于666
                         SuperBlockSercive.saveToDisk();
+                        updataComboBox();
                         JOptionPane.showMessageDialog(null, "创建完成！");
                     } else {
                         JOptionPane.showMessageDialog(null, "创建失败！用户名为空或重复！");

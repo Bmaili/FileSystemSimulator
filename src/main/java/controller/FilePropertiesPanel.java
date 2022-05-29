@@ -8,6 +8,9 @@ import service.OsFileService;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * 文件相信信息的展示控件，描述其UI并绑定相关事件
+ */
 public class FilePropertiesPanel extends JTextArea {
     FilePropertiesPanel() {
         this.setEditable(false);
@@ -15,6 +18,7 @@ public class FilePropertiesPanel extends JTextArea {
         this.setFont(font);
     }
 
+    //更新数据
     public void updateData() {
         OsFile selectFile = FileWindow.selectFile;
         if (selectFile == null) {

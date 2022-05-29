@@ -3,10 +3,14 @@ package controller;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * 打开该系统后的主界面，包含登陆、用户组、设置三个界面
+ */
 public class MainWindow extends JFrame {
+    public static MainWindow mainWIndow = new MainWindow();
 
     public static void boot() {
-        MainWindow mainWIndow = new MainWindow();
+
         // 创建选项卡面板
         JTabbedPane tabbedPane = new JTabbedPane();
         ClassLoader loader = mainWIndow.getClass().getClassLoader();

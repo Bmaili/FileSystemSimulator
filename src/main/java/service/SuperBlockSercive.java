@@ -7,9 +7,39 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+/**
+ * 超级块服务类，定义了一些系统操作
+ */
 public class SuperBlockSercive {
     public static String superPass;
 
+    /**
+     * 初始化系统数据
+     *
+     * @param
+     * @return
+     * @date 18:24 2022/5/29
+     */
+    public static void boot() {
+        //1.加载管理员密码
+        readSuperPass();
+
+        //2.加载数据
+        File file = new File("disk_data");
+        if (file.isFile() && file.exists()) {
+            readFromDisk();
+        } else {//第一次使用，没有该文件，则创建
+            initSuperBlock();
+        }
+    }
+
+    /**
+     * 初始化超级块，当第一次使用该系统或格式化该系统后，调用此方法初始化系统
+     *
+     * @param
+     * @return
+     * @date 18:22 2022/5/29
+     */
     private static void initSuperBlock() {
         SuperBlock.superBlock.freeBlocks = new LinkedList<>();
         SuperBlock.superBlock.freeINodes = new LinkedList<>();
@@ -40,10 +70,10 @@ public class SuperBlockSercive {
         User user6 = new User("河图", "666");
         SuperBlock.superBlock.userList.add(user6);
         SuperBlock.superBlock.userGroupList.get(2).members.add(user6);
-        for (int i = 0; i < 1024; i++) {
+        for (int i = 0; i < 1024; i++) {//1024块Block
             BlockService.freeOneBlock(new Block());
         }
-        for (int i = 0; i < 216; i++) {
+        for (int i = 0; i < 216; i++) {//216个Inode结点
             INodeService.freeOneINode(new INode());
         }
         User rootUser = new User("root", "root");
@@ -58,6 +88,13 @@ public class SuperBlockSercive {
         FileWindow.folderNow = SuperBlock.superBlock.rootFile;
     }
 
+    /**
+     * 将当前数据持久化到磁盘中
+     *
+     * @param
+     * @return
+     * @date 18:22 2022/5/29
+     */
     public static void saveToDisk() {
         try (//创建一个ObjectOutputStream输出流
              ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("disk_data"))) {
@@ -67,6 +104,13 @@ public class SuperBlockSercive {
         }
     }
 
+    /**
+     * 从磁盘中读出超级块数据
+     *
+     * @param
+     * @return
+     * @date 18:23 2022/5/29
+     */
     public static void readFromDisk() {
         File file = new File("disk_data");
         try (//创建一个ObjectInputStream输入流
@@ -77,6 +121,13 @@ public class SuperBlockSercive {
         }
     }
 
+    /**
+     * 格式化磁盘
+     *
+     * @param
+     * @return
+     * @date 18:23 2022/5/29
+     */
     public static void formatDisk() {
         File file = new File("disk_data");
         if (file.isFile() && file.exists()) {
@@ -84,19 +135,13 @@ public class SuperBlockSercive {
         }
     }
 
-    public static void boot() {
-        //1.加载管理员密码
-        readSuperPass();
-
-        //2.加载数据
-        File file = new File("disk_data");
-        if (file.isFile() && file.exists()) {
-            readFromDisk();
-        } else {//第一次使用，没有该文件，则创建
-            initSuperBlock();
-        }
-    }
-
+    /**
+     * 读取管理员密码
+     *
+     * @param
+     * @return
+     * @date 18:25 2022/5/29
+     */
     private static void readSuperPass() {
         File file = new File("super_pass");
         if (file.isFile() && file.exists()) {
@@ -110,6 +155,13 @@ public class SuperBlockSercive {
         }
     }
 
+    /**
+     * 更改管理员密码
+     *
+     * @param
+     * @return
+     * @date 18:25 2022/5/29
+     */
     public static void saveSuperPass(String pass) {
         File file = new File("super_pass");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {

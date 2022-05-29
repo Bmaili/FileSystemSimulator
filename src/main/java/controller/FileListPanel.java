@@ -7,7 +7,9 @@ import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 
-
+/**
+ * 文件列表控件，描述其UI并绑定相关事件
+ */
 public class FileListPanel extends JList {
     //列表的数据Model，用于列表数据的增删改
     private DefaultListModel<OsFile> pageModel = new DefaultListModel<>();
@@ -23,11 +25,12 @@ public class FileListPanel extends JList {
         for (int i = 0; i < list.size(); i++) {
             pageModel.add(i, list.get(i));
         }
-        // this.setSelectedIndex(0);
-        // setModel(pageModel);    //为列表填充数据
     }
 }
 
+/**
+ * 自定义列表单元格
+ */
 class ListCell extends DefaultListCellRenderer {
     private ImageIcon folder;
     private ImageIcon file;
@@ -41,6 +44,7 @@ class ListCell extends DefaultListCellRenderer {
         file.setImage(file.getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
     }
 
+    //重新定义选项事件
     @Override
     public Component getListCellRendererComponent(JList<? extends Object> list,
                                                   Object value, int index, boolean isSelected, boolean cellHasFocus) {

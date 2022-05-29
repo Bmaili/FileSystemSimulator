@@ -5,6 +5,9 @@ import pojo.*;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * 文件系统操作的窗口,描述其UI
+ */
 public class FileWindow extends JFrame {
     public static User userNow;
     public static Folder folderNow;
@@ -12,9 +15,10 @@ public class FileWindow extends JFrame {
     public static FilePropertiesPanel fileProperties;
     public static FileListPanel fileListPanel;
 
-    public static FileWindow fileWindow = new FileWindow();
+    public static FileWindow fileWindow = null;
 
     public static void init() {
+        fileWindow = new FileWindow();
         fileProperties = new FilePropertiesPanel();
         fileListPanel = new FileListPanel();
 
@@ -39,7 +43,14 @@ public class FileWindow extends JFrame {
         fileProperties.setPreferredSize(new Dimension(580, 450));
         contentPane.add(fileProperties, BorderLayout.EAST);
 
+        JLabel userlabel = new JLabel();
+        userlabel.setText("当前用户：" + FileWindow.userNow +
+                "   当前目录：" +
+                FileWindow.folderNow.iNode.path + FileWindow.folderNow.filename + "/");
+        JPanel panel = new JPanel();
         ButtonMenuPanel menu = new ButtonMenuPanel();
+        panel.add(userlabel);
+        panel.add(menu);
         contentPane.add(menu);
         fileWindow.add(contentPane);
         fileWindow.setVisible(true);

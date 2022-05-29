@@ -7,6 +7,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * 设置界面，描述其UI并绑定相关事件
+ */
 public class SetupPanel extends JPanel {
     JButton changePWBtn = new JButton("更改管理员密码");
     JButton helpBtn = new JButton("使用说明");
@@ -117,13 +120,21 @@ public class SetupPanel extends JPanel {
         helpBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                String s = "1. 管理员默认密码：root ，管理员密码保存于文件super_pass中。\n" +
-                        "2. 用户默认密码：666。\n" +
-                        "3. 功能：\n" +
-                        "   - 多用户的相关操作\n" +
-                        "   - 用户组管理\n" +
+                String s = "1. 功能：\n" +
+                        "   - 用户及用户组的管理及相关操作\n" +
                         "   - 文件/目录增删改查等功能\n" +
-                        "   - 针对于单一文件/目录的授权、鉴权";
+                        "   - 针对于单一文件/目录的授权、鉴权\n" +
+                        "\n" +
+                        "2. 默认项：\n" +
+                        "   - 管理员密码: root \n" +
+                        "   - 用户密码: 666\n" +
+                        "   - 单Block大小: 512byte ,Block数量: 1024\n" +
+                        "\n" +
+                        "3. 权限相关:\n" +
+                        "   - 使用数字累和定义权限: 执行权限: 1 ,写权限: 2 ,读权限: 4  \n" +
+                        "   - 用户操作文件/目录时需要具有相应的权限\n" +
+                        "   - 文件所有者可分配权限\n" +
+                        "   - 为用户组分配权限意味着为该组所有成员分配权限";
                 JOptionPane.showMessageDialog(null, s, "使用说明", JOptionPane.INFORMATION_MESSAGE);
             }
         });

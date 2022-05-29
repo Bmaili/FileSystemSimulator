@@ -8,6 +8,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+/**
+ * 文件搜索模块的弹窗，描述其UI并绑定相关事件
+ */
 public class SearchFileDialog extends JDialog {
 
     SearchFileDialog() {
@@ -46,6 +49,7 @@ public class SearchFileDialog extends JDialog {
         });
     }
 
+    //将搜索的列表结果转换成字符串，方便展示
     private String searchResToString(ArrayList<String> res) {
         if (res == null || res.size() == 0) {
             return "该目录下没有此文件哦！";
