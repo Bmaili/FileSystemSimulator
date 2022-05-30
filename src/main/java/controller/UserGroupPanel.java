@@ -34,12 +34,6 @@ public class UserGroupPanel extends JPanel {
         UserGroup item = (UserGroup) groupCombo.getSelectedItem();
         User[] array = item.members.toArray(new User[]{});
         userCombo.setModel(new DefaultComboBoxModel<>(array));
-        // if (groupCombo.getItemCount() > 0) {
-        //     groupCombo.setSelectedIndex(0);
-        // }
-        // if (userCombo.getItemCount() > 0) {
-        //     userCombo.setSelectedIndex(0);
-        // }
     }
 
     private void uiInit() {

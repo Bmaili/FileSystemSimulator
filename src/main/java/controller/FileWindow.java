@@ -9,11 +9,11 @@ import java.awt.*;
  * 文件系统操作的窗口,描述其UI
  */
 public class FileWindow extends JFrame {
-    public static User userNow;
-    public static Folder folderNow;
-    public static OsFile selectFile;
-    public static FilePropertiesPanel fileProperties;
-    public static FileListPanel fileListPanel;
+    public static User userNow; //当前登陆的用户
+    public static Folder folderNow;//当前所处在的目录
+    public static OsFile selectFile;//选择的文件（高亮显示的那个）
+    public static FilePropertiesPanel fileProperties;//左边文件列表区域
+    public static FileListPanel fileListPanel;//右边文件详情区域
 
     public static FileWindow fileWindow = null;
 
