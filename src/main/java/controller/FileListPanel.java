@@ -1,9 +1,12 @@
 package controller;
 
 import pojo.OsFile;
+import service.OsFileService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -17,6 +20,7 @@ public class FileListPanel extends JList {
     FileListPanel() {
         setModel(pageModel);
         setCellRenderer(new ListCell());
+        bindEvent();
     }
 
     public void updateData() {
@@ -26,6 +30,30 @@ public class FileListPanel extends JList {
             pageModel.add(i, list.get(i));
         }
     }
+
+    private void bindEvent() {
+        this.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                int click_num = e.getClickCount();
+                if (click_num == 2) {
+                    // 1. 如果不是普通文件，那没事了
+                    if (FileWindow.selectFile.iNode.fileType != 0) {
+                        return;
+                    }
+
+                    //2. 需要读取权限
+                    boolean b = OsFileService.authCheck(FileWindow.selectFile, FileWindow.userNow, 4);
+                    if (b) {
+                        OsFileService.openOsFile(FileWindow.selectFile);//打开虚拟文件
+                    } else {
+                        System.out.println("权限不足！无法打开文件！");
+                    }
+                }
+            }
+        });
+    }
+
+
 }
 
 /**
@@ -65,6 +93,7 @@ class ListCell extends DefaultListCellRenderer {
             FileWindow.fileProperties.updateData();
             setBackground(Color.cyan);
         }
+
 
         return this;
     }

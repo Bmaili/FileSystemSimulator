@@ -1,12 +1,12 @@
 package service;
 
+import controller.ButtonMenuPanel;
 import controller.FileWindow;
 import pojo.*;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -281,5 +281,35 @@ public class OsFileService {
         }
         Integer userAuth = osFile.iNode.userACL.getOrDefault(user, 0);
         return (userAuth & auth) == auth;//将用户具备的权限与需要的权限 按位与
+    }
+
+    /**
+     * 调用Windows操作系统接口，模拟双击操作，打开文件
+     *
+     * @param
+     * @return
+     * @date 18:57 2022/6/3
+     */
+    public static void openOsFile(OsFile osFile) {
+        //1. 获得模拟文件的后缀名（如txt、png、mp3），如果没有后缀名，默认txt文本打开
+        String[] split = osFile.filename.split("\\.");//以小数点分割
+        String suffix = "txt";//获得后缀名
+        if (split.length > 1) {
+            suffix = split[1];
+        }
+
+        //2. 在操作系统中建立临时文件
+        String tempFilePath = "temp_file." + suffix;
+        File tempFile = new File(tempFilePath);
+        osFileToFile(osFile, tempFilePath);
+
+        //3. 调用系统API打开文件
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            //调用AOPI打开临时文件
+            runtime.exec("rundll32 url.dll FileProtocolHandler " + tempFile.getAbsolutePath());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

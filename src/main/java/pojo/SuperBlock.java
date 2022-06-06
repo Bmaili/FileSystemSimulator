@@ -19,4 +19,5 @@ public class SuperBlock implements Serializable {
     private SuperBlock() {}
 
     public static SuperBlock superBlock = new SuperBlock();
+
 }

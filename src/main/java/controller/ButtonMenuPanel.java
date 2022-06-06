@@ -24,6 +24,7 @@ public class ButtonMenuPanel extends JPanel {
     JButton writeFileBtn = new JButton("写入文件");
     JButton createFileBtn = new JButton("创建文件");
     JButton readFileBtn = new JButton("读取文件");
+    // JButton openFileBtn = new JButton("打开文件");
     JButton reNameFileBtn = new JButton("重命名目录/文件");
     JButton delteFileBtn = new JButton("删除目录/文件");
     JButton enterCaBtn = new JButton("进入目录");
@@ -257,6 +258,7 @@ public class ButtonMenuPanel extends JPanel {
                 updataLabel();
             }
         });
+
     }
 
     private void updataLabel() {
